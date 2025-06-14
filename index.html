@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Validation Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #212529;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+		h1 {
+		    color: #2c3e50; /* un grigio/blu scuro leggibile */
+		    text-align: center;
+		    margin-bottom: 20px;
+		    font-weight: 600;
+		    font-size: 3rem;
+		    text-shadow: none; /* rimuove l'ombra nera */
+		}
+
+        .intro {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .intro h3 {
+            color: #2c3e50;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .intro p {
+            color: #5a6c7d;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .intro-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: rgba(52, 73, 94, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #3498db;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .feature-text {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2:before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #3498db;
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .sampling-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+            margin: 20px 0;
+        }
+
+        .sampling-card {
+            padding: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+	
+		.sampling-options {
+		    align-items: stretch; /* forza l'allineamento verticale */
+		}
+
+		.sampling-card {
+		    display: flex;
+		    flex-direction: column;
+		    justify-content: flex-start;
+		    min-height: 180px; /* o 200px, adattalo visivamente */
+		}
+
+        .sampling-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+        }
+
+        .sampling-card.active {
+            border-color: #3498db;
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #3498db;
+        }
+
+        .radio-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .percentage-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .percentage-input input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .percentage-input input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .validation-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .cluster-selection {
+            margin: 20px 0;
+        }
+
+        .cluster-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .cluster-table th,
+        .cluster-table td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        .cluster-table th {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .cluster-table td {
+            background: white;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .cluster-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .cluster-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .cluster-checkbox input {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .validation-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .cluster-info {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .image-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-height: 60vh;
+        }
+
+        .validation-image {
+            max-width: 90vw;
+            max-height: 60vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            object-fit: contain;
+        }
+
+        .validation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .validation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .validation-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            min-width: 160px;
+            transition: all 0.3s;
+        }
+
+        .btn-ai {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-ai:hover {
+            background: #c0392b;
+        }
+
+        .btn-not-ai {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-not-ai:hover {
+            background: #229954;
+        }
+
+        .btn-unclear {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-unclear:hover {
+            background: #e67e22;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            transition: width 0.3s;
+        }
+
+        .image-error {
+            padding: 40px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .validation-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .validation-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .validation-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .validation-controls .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Image Validation Tool</h1>
+
+        <!-- Introduction -->
+        <div class="intro">
+            <h3>🤖 Academic Image Validation System</h3>
+            <p>Advanced tool for validating AI-generated images in research datasets</p>
+            
+            <div class="intro-features">
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Smart cluster analysis</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text">Stratified sampling</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💾</div>
+                    <div class="feature-text">Resume sessions</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Real-time export</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="section" id="upload-section">
+            <h2>Upload CSV File</h2>
+            <div class="file-input-wrapper">
+                <input type="file" id="csv-file" class="file-input" accept=".csv" />
+                <button class="file-input-button">Choose CSV File</button>
+            </div>
+            <div id="file-info" class="hidden">
+                <p><strong>File:</strong> <span id="file-name"></span></p>
+            </div>
+        </div>
+
+        <!-- Data Overview -->
+        <div class="section hidden" id="overview-section">
+            <h2>Data Overview</h2>
+            <div class="overview">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-rows">0</div>
+                    <div class="stat-label">Total Rows</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="unique-images">0</div>
+                    <div class="stat-label">Unique Images</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="cluster-count">0</div>
+                    <div class="stat-label">Clusters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="validated-count">0</div>
+                    <div class="stat-label">Already Validated</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cluster Selection -->
+        <div class="section hidden" id="cluster-section">
+            <h2>Select Clusters to Validate</h2>
+            <div class="button-group">
+                <button class="btn btn-secondary" id="select-all">Select All</button>
+                <button class="btn btn-secondary" id="deselect-all">Deselect All</button>
+            </div>
+            <div class="cluster-selection">
+                <table class="cluster-table" id="cluster-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Cluster</th>
+                            <th>Images</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cluster-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sampling Options -->
+        <div class="section hidden" id="sampling-section">
+            <h2>Sampling Method</h2>
+            <div class="sampling-options">
+                <div class="sampling-card" id="validate-all-card">
+                    <div class="radio-group">
+                        <input type="radio" id="validate-all" name="sampling" value="all" checked>
+                        <label for="validate-all">Validate All Images</label>
+                    </div>
+                    <div class="sampling-description">
+                        Process every image in the selected clusters for comprehensive validation
+                    </div>
+                </div>
+                
+                <div class="sampling-card" id="stratified-sample-card">
+                    <div class="radio-group">
+                        <input type="radio" id="stratified-sample" name="sampling" value="sample">
+                        <label for="stratified-sample">Stratified Sample by Cluster</label>
+                    </div>
+                    <div class="sampling-description">
+                        Take a representative sample from each cluster for efficient validation
+                    </div>
+                    <div class="percentage-input">
+                        <label for="sample-percentage">Sample size:</label>
+                        <input type="number" id="sample-percentage" min="1" max="100" value="10">
+                        <span>% per cluster</span>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" id="start-validation">🚀 Start Validation</button>
+            </div>
+        </div>
+
+        <!-- Validation Interface -->
+        <div class="validation-interface hidden" id="validation-section">
+            <div class="validation-content">
+                <div class="progress-section">
+                    <div class="cluster-info" id="cluster-info"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div id="progress-text">0 / 0 images validated</div>
+                </div>
+
+                <div class="image-container" id="image-container">
+                    <div class="loading">Loading image...</div>
+                </div>
+
+                <div class="validation-buttons">
+                    <button class="validation-btn btn-ai" id="btn-very-ai">Very Likely AI</button>
+                    <button class="validation-btn btn-not-ai" id="btn-very-not-ai">Very Likely Not AI</button>
+                    <button class="validation-btn btn-unclear" id="btn-not-clear">Not Clear</button>
+                </div>
+
+                <div class="validation-controls">
+                    <button class="btn btn-secondary" id="export-partial">Export Results</button>
+                    <button class="btn btn-secondary" id="skip-image">Skip Image</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Section -->
+        <div class="section hidden" id="completion-section">
+            <h2>Validation Complete!</h2>
+            <p>All selected images have been validated.</p>
+            <div class="button-group">
+                <button class="btn btn-success" id="export-final">Export Final Results</button>
+                <button class="btn btn-secondary" id="restart">Start New Validation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AIImageValidator {
+            constructor() {
+                this.csvData = [];
+                this.uniqueImages = new Map();
+                this.clusters = new Set();
+                this.selectedClusters = new Set();
+                this.validationQueue = [];
+                this.currentIndex = 0;
+                this.currentCluster = null;
+                this.validationResults = new Map();
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('csv-file').addEventListener('change', (e) => this.handleFileUpload(e));
+                document.getElementById('select-all').addEventListener('click', () => this.selectAllClusters());
+                document.getElementById('deselect-all').addEventListener('click', () => this.deselectAllClusters());
+                document.getElementById('start-validation').addEventListener('click', () => this.startValidation());
+                
+                // Sampling method cards
+                document.getElementById('validate-all-card').addEventListener('click', () => {
+                    document.getElementById('validate-all').checked = true;
+                    this.updateSamplingCards();
+                });
+                document.getElementById('stratified-sample-card').addEventListener('click', () => {
+                    document.getElementById('stratified-sample').checked = true;
+                    this.updateSamplingCards();
+                });
+                document.getElementById('validate-all').addEventListener('change', () => this.updateSamplingCards());
+                document.getElementById('stratified-sample').addEventListener('change', () => this.updateSamplingCards());
+                
+                // Validation buttons
+                document.getElementById('btn-very-ai').addEventListener('click', () => this.validateImage('Very Likely AI'));
+                document.getElementById('btn-very-not-ai').addEventListener('click', () => this.validateImage('Very Likely Not AI'));
+                document.getElementById('btn-not-clear').addEventListener('click', () => this.validateImage('Not Clear'));
+                document.getElementById('skip-image').addEventListener('click', () => this.skipImage());
+                
+                // Export buttons
+                document.getElementById('export-partial').addEventListener('click', () => this.exportResults());
+                document.getElementById('export-final').addEventListener('click', () => this.exportResults());
+                document.getElementById('restart').addEventListener('click', () => this.restart());
+            }
+
+            updateSamplingCards() {
+                const validateAllCard = document.getElementById('validate-all-card');
+                const stratifiedCard = document.getElementById('stratified-sample-card');
+                const validateAllRadio = document.getElementById('validate-all');
+                
+                if (validateAllRadio.checked) {
+                    validateAllCard.classList.add('active');
+                    stratifiedCard.classList.remove('active');
+                } else {
+                    validateAllCard.classList.remove('active');
+                    stratifiedCard.classList.add('active');
+                }
+            }
+
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                try {
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-info').classList.remove('hidden');
+
+                    const text = await this.readFileAsText(file);
+                    this.parseCSV(text);
+                    this.analyzeData();
+                    this.showOverview();
+                    this.showClusterSelection();
+                    this.showSamplingOptions();
+                } catch (error) {
+                    this.showError('Error reading file: ' + error.message);
+                }
+            }
+
+            readFileAsText(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = () => reject(new Error('Failed to read file'));
+                    reader.readAsText(file);
+                });
+            }
+
+            parseCSV(text) {
+                const lines = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                        current += char;
+                    } else if (char === '\n' && !inQuotes) {
+                        lines.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                if (current.trim()) {
+                    lines.push(current.trim());
+                }
+
+                if (lines.length < 2) {
+                    throw new Error('CSV file must have at least a header and one data row');
+                }
+
+                const headers = this.parseCSVLine(lines[0]);
+                const requiredHeaders = ['nome_file', 'url_file', 'text_associato', 'description', 'full_text', 'cluster', 'UMAP1', 'UMAP2'];
+                
+                for (const required of requiredHeaders) {
+                    if (!headers.includes(required)) {
+                        throw new Error(`Missing required column: ${required}`);
+                    }
+                }
+
+                this.csvData = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (lines[i].trim()) {
+                        const values = this.parseCSVLine(lines[i]);
+                        if (values.length === headers.length) {
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                row[header] = values[index];
+                            });
+                            this.csvData.push(row);
+                        }
+                    }
+                }
+
+                console.log(`Parsed ${this.csvData.length} rows from CSV`);
+            }
+
+            parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        if (inQuotes && line[i + 1] === '"') {
+                            current += '"';
+                            i++; // Skip next quote
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                result.push(current.trim());
+                
+                // Remove surrounding quotes if present
+                return result.map(value => {
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        return value.slice(1, -1);
+                    }
+                    return value;
+                });
+            }
+
+            analyzeData() {
+                this.uniqueImages.clear();
+                this.clusters.clear();
+                let validatedCount = 0;
+
+                this.csvData.forEach(row => {
+                    // Track unique images
+                    if (!this.uniqueImages.has(row.nome_file)) {
+                        this.uniqueImages.set(row.nome_file, {
+                            url: row.url_file,
+                            firstRow: row
+                        });
+                    }
+
+                    // Track clusters
+                    const cluster = parseInt(row.cluster);
+                    if (!isNaN(cluster)) {
+                        this.clusters.add(cluster);
+                    }
+
+                    // Check if already validated
+                    if (row.validation_result) {
+                        validatedCount++;
+                    }
+                });
+
+                console.log(`Found ${this.uniqueImages.size} unique images across ${this.clusters.size} clusters`);
+            }
+
+            showOverview() {
+                document.getElementById('total-rows').textContent = this.csvData.length;
+                document.getElementById('unique-images').textContent = this.uniqueImages.size;
+                document.getElementById('cluster-count').textContent = this.clusters.size;
+                document.getElementById('validated-count').textContent = 
+                    this.csvData.filter(row => row.validation_result).length;
+                
+                document.getElementById('overview-section').classList.remove('hidden');
+            }
+
+            showClusterSelection() {
+                const tbody = document.getElementById('cluster-tbody');
+                tbody.innerHTML = '';
+
+                const sortedClusters = Array.from(this.clusters).sort((a, b) => a - b);
+                
+                sortedClusters.forEach(cluster => {
+                    const row = document.createElement('tr');
+                    const count = this.csvData.filter(row => parseInt(row.cluster) === cluster).length;
+                    
+                    row.innerHTML = `
+                        <td>
+                            <div class="cluster-checkbox">
+                                <input type="checkbox" id="cluster-${cluster}" value="${cluster}" checked>
+                            </div>
+                        </td>
+                        <td><label for="cluster-${cluster}">Cluster ${cluster}</label></td>
+                        <td>${count} images</td>
+                    `;
+                    
+                    row.querySelector('input').addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            this.selectedClusters.add(cluster);
+                        } else {
+                            this.selectedClusters.delete(cluster);
+                        }
+                    });
+                    
+                    tbody.appendChild(row);
+                    this.selectedClusters.add(cluster);
+                });
+
+                document.getElementById('cluster-section').classList.remove('hidden');
+            }
+
+            selectAllClusters() {
+                document.querySelectorAll('#cluster-tbody input[type="checkbox"]').forEach(cb => {
+                    cb.checked = true;
+                    this.selectedClusters.add(parseInt(cb.value));
+                });
+            }
+
+            deselectAllClusters() {
+                document.querySelectorAll('#cluster-tbody input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                    this.selectedClusters.delete(parseInt(cb.value));
+                });
+            }
+
+            showSamplingOptions() {
+                document.getElementById('sampling-section').classList.remove('hidden');
+                this.updateSamplingCards();
+            }
+
+            startValidation() {
+                if (this.selectedClusters.size === 0) {
+                    this.showError('Please select at least one cluster to validate.');
+                    return;
+                }
+
+                this.prepareValidationQueue();
+                if (this.validationQueue.length === 0) {
+                    this.showError('No images to validate. All selected images may already be validated.');
+                    return;
+                }
+
+                this.currentIndex = 0;
+                this.showValidationInterface();
+                this.loadCurrentImage();
+            }
+
+            prepareValidationQueue() {
+                const isStratified = document.getElementById('stratified-sample').checked;
+                const percentage = parseFloat(document.getElementById('sample-percentage').value) / 100;
+
+                this.validationQueue = [];
+                const processedImages = new Set();
+
+                if (isStratified) {
+                    // Stratified sampling by cluster
+                    this.selectedClusters.forEach(cluster => {
+                        const clusterImages = [];
+                        this.csvData.forEach(row => {
+                            if (parseInt(row.cluster) === cluster && !row.validation_result && !processedImages.has(row.nome_file)) {
+                                clusterImages.push({
+                                    fileName: row.nome_file,
+                                    url: row.url_file,
+                                    cluster: cluster
+                                });
+                                processedImages.add(row.nome_file);
+                            }
+                        });
+
+                        // Sample from this cluster
+                        const sampleSize = Math.max(1, Math.ceil(clusterImages.length * percentage));
+                        const shuffled = clusterImages.sort(() => 0.5 - Math.random());
+                        this.validationQueue.push(...shuffled.slice(0, sampleSize));
+                    });
+                } else {
+                    // Validate all selected images
+                    this.selectedClusters.forEach(cluster => {
+                        this.csvData.forEach(row => {
+                            if (parseInt(row.cluster) === cluster && !row.validation_result && !processedImages.has(row.nome_file)) {
+                                this.validationQueue.push({
+                                    fileName: row.nome_file,
+                                    url: row.url_file,
+                                    cluster: cluster
+                                });
+                                processedImages.add(row.nome_file);
+                            }
+                        });
+                    });
+                }
+
+                // Sort by cluster for organized validation
+                this.validationQueue.sort((a, b) => a.cluster - b.cluster);
+                console.log(`Prepared validation queue with ${this.validationQueue.length} images`);
+            }
+
+            showValidationInterface() {
+                document.getElementById('validation-section').classList.remove('hidden');
+                // Scroll to top and disable body scroll
+                window.scrollTo(0, 0);
+                document.body.style.overflow = 'hidden';
+            }
+
+            updateProgress() {
+                const current = this.currentIndex;
+                const total = this.validationQueue.length;
+                const percentage = total > 0 ? (current / total) * 100 : 0;
+
+                document.getElementById('progress-fill').style.width = `${percentage}%`;
+                document.getElementById('progress-text').textContent = `${current} / ${total} images validated`;
+
+                if (this.validationQueue[this.currentIndex]) {
+                    const currentCluster = this.validationQueue[this.currentIndex].cluster;
+                    const clusterImages = this.validationQueue.filter(img => img.cluster === currentCluster);
+                    const clusterIndex = this.validationQueue.slice(0, this.currentIndex).filter(img => img.cluster === currentCluster).length;
+                    
+                    document.getElementById('cluster-info').textContent = 
+                        `Cluster ${currentCluster} (${clusterIndex + 1} of ${clusterImages.length})`;
+                }
+            }
+
+            async loadCurrentImage() {
+                if (this.currentIndex >= this.validationQueue.length) {
+                    this.showCompletion();
+                    return;
+                }
+
+                this.updateProgress();
+                const currentImage = this.validationQueue[this.currentIndex];
+                const container = document.getElementById('image-container');
+                
+                container.innerHTML = '<div class="loading">Loading image...</div>';
+
+                try {
+                    const imageElement = await this.loadImageWithFallback(currentImage.url, currentImage.fileName);
+                    container.innerHTML = '';
+                    container.appendChild(imageElement);
+                } catch (error) {
+                    console.error('Failed to load image:', error);
+                    container.innerHTML = `
+                        <div class="image-error">
+                            <p>Failed to load image: ${currentImage.fileName}</p>
+                            <p><a href="${currentImage.url}" target="_blank">Open in New Tab</a></p>
+                        </div>
+                    `;
+                }
+            }
+
+            async loadImageWithFallback(originalUrl, fileName) {
+                const img = document.createElement('img');
+                img.className = 'validation-image';
+                img.alt = fileName;
+
+                // Extract file ID from Google Drive URL
+                const fileIdMatch = originalUrl.match(/[?&]id=([^&]+)/);
+                if (!fileIdMatch) {
+                    throw new Error('Could not extract file ID from URL');
+                }
+                const fileId = fileIdMatch[1];
+
+                // Try multiple URL formats
+                const urlsToTry = [
+                    `https://lh3.googleusercontent.com/d/${fileId}`,
+                    `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`,
+                    `https://drive.google.com/uc?export=download&id=${fileId}`,
+                    originalUrl
+                ];
+
+                for (const url of urlsToTry) {
+                    try {
+                        await new Promise((resolve, reject) => {
+                            const testImg = new Image();
+                            testImg.onload = () => {
+                                img.src = url;
+                                resolve();
+                            };
+                            testImg.onerror = () => reject(new Error('Failed to load'));
+                            testImg.src = url;
+                            
+                            // Timeout after 5 seconds
+                            setTimeout(() => reject(new Error('Timeout')), 5000);
+                        });
+                        return img;
+                    } catch (error) {
+                        console.log(`Failed to load from ${url}:`, error.message);
+                        continue;
+                    }
+                }
+
+                throw new Error('All image load attempts failed');
+            }
+
+            validateImage(result) {
+                const currentImage = this.validationQueue[this.currentIndex];
+                this.validationResults.set(currentImage.fileName, {
+                    result: result,
+                    timestamp: new Date().toISOString()
+                });
+
+                this.currentIndex++;
+                this.loadCurrentImage();
+            }
+
+            skipImage() {
+                this.currentIndex++;
+                this.loadCurrentImage();
+            }
+
+            showCompletion() {
+                document.getElementById('validation-section').classList.add('hidden');
+                document.getElementById('completion-section').classList.remove('hidden');
+                // Re-enable body scroll
+                document.body.style.overflow = 'auto';
+            }
+
+            exportResults() {
+                // Apply validation results to all rows with the same image
+                const exportData = this.csvData.map(row => {
+                    const validation = this.validationResults.get(row.nome_file);
+                    return {
+                        ...row,
+                        selected_for_validation: this.validationQueue.some(img => img.fileName === row.nome_file) ? 'Yes' : 'No',
+                        validation_result: validation ? validation.result : (row.validation_result || ''),
+                        validated_at: validation ? validation.timestamp : (row.validated_at || '')
+                    };
+                });
+
+                // Convert to CSV
+                const headers = Object.keys(exportData[0]);
+                const csvContent = [
+                    headers.join(','),
+                    ...exportData.map(row => 
+                        headers.map(header => {
+                            const value = row[header] || '';
+                            // Escape quotes and wrap in quotes if contains comma
+                            const escaped = value.toString().replace(/"/g, '""');
+                            return escaped.includes(',') ? `"${escaped}"` : escaped;
+                        }).join(',')
+                    )
+                ].join('\n');
+
+                // Download file
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'validation_results.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.showSuccess('Results exported successfully!');
+            }
+
+            restart() {
+                this.csvData = [];
+                this.uniqueImages.clear();
+                this.clusters.clear();
+                this.selectedClusters.clear();
+                this.validationQueue = [];
+                this.currentIndex = 0;
+                this.validationResults.clear();
+
+                // Hide all sections except upload
+                document.querySelectorAll('.section').forEach(section => {
+                    if (section.id !== 'upload-section') {
+                        section.classList.add('hidden');
+                    }
+                });
+
+                // Reset file input
+                document.getElementById('csv-file').value = '';
+                document.getElementById('file-info').classList.add('hidden');
+                
+                // Re-enable body scroll
+                document.body.style.overflow = 'auto';
+            }
+
+            showError(message) {
+                const existing = document.querySelector('.error');
+                if (existing) existing.remove();
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = message;
+                
+                const container = document.querySelector('.container');
+                container.insertBefore(errorDiv, container.firstChild);
+
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 5000);
+            }
+
+            showSuccess(message) {
+                const existing = document.querySelector('.success');
+                if (existing) existing.remove();
+
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success';
+                successDiv.textContent = message;
+                
+                const container = document.querySelector('.container');
+                container.insertBefore(successDiv, container.firstChild);
+
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.parentNode.removeChild(successDiv);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new AIImageValidator();
+        });
+    </script>
+</body>
+</html>
+                    
